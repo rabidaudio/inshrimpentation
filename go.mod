@@ -1,0 +1,9 @@
+module github.com/rabidaudio/inshrimpentation
+
+go 1.26.3
+
+require (
+	github.com/mattn/go-sqlite3 v1.14.53 // indirect
+	github.com/stretchr/testify v1.12.1 // indirect
+	go.yaml.in/yaml/v3 v3.0.5 // indirect
+)
