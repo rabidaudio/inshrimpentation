@@ -36,7 +36,7 @@ func NewServer(db *database.DB) http.Handler {
 	// serve static files from dist outside of /api path
 	s := chi.NewRouter()
 	s.Mount("/api", r)
-	s.Mount("/", http.FileServer(http.Dir("dist")))
+	s.Mount("/", http.FileServer(http.Dir("frontend/dist")))
 	return s
 }
 
