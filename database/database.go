@@ -1,6 +1,6 @@
 // Package db exposes a sqlite3 database for recording
 // measurements
-package db
+package database
 
 import (
 	"context"
@@ -11,7 +11,7 @@ import (
 	"os"
 
 	_ "github.com/mattn/go-sqlite3"
-	"github.com/rabidaudio/inshrimpentation/common"
+	"github.com/rabidaudio/inshrimpentation/api"
 )
 
 type DB struct {
@@ -19,9 +19,9 @@ type DB struct {
 }
 
 func path() string {
-	env := common.GetEnv()
+	env := api.Env()
 	dir := ""
-	if env == common.Test {
+	if env == api.Test {
 		dir = "../"
 	}
 	return fmt.Sprintf("%vstorage/database_%v.db", dir, env)
@@ -67,7 +67,7 @@ func Create() error {
 }
 
 func (db *DB) Wipe() {
-	if common.GetEnv() != common.Test {
+	if !api.IsEnv(api.Test) {
 		panic("Don't wipe real database")
 	}
 	err := os.Remove(path())
