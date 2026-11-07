@@ -3,10 +3,12 @@ package main
 import (
 	"bufio"
 	"context"
+	"errors"
 	"fmt"
 	"log"
+	"net"
 	"os"
-	"syscall"
+	"sync"
 	"time"
 
 	"github.com/rabidaudio/inshrimpentation/api"
@@ -16,51 +18,56 @@ func main() {
 	log.Printf("starting server, env: %v\n", api.Env())
 
 	var err error
-	if err = syscall.Mkfifo("foo_pipe", 0666); err != nil {
-		panic(err)
-	}
-	defer os.Remove("foo_pipe")
 
 	ctx, cancel := context.WithCancel(context.Background())
 
-	for i := range 3 {
-		go func() {
-			f, err := os.OpenFile("foo_pipe", os.O_RDONLY, os.ModeNamedPipe)
-			if err != nil {
-				panic(err)
-			}
-			defer f.Close()
-
-			fmt.Printf("start [%v]\n", i)
-			scanner := bufio.NewScanner(f)
-			for scanner.Scan() {
-				line := scanner.Text()
-				fmt.Printf("Recv [%v]: %v\n", i, line)
-			}
-			if err := scanner.Err(); err != nil {
-				fmt.Printf("error [%v]: %v\n", i, err)
-			}
-		}()
+	p, err := net.ListenUnixgram("unixgram", &net.UnixAddr{Name: "test.sock", Net: "unixgram"})
+	if err != nil {
+		panic(err)
 	}
+	defer p.Close()
+	defer os.Remove("test.sock")
 
 	// writer
-	go func(ctx context.Context) {
-		f, err := os.OpenFile("foo_pipe", os.O_WRONLY, os.ModeNamedPipe)
-		if err != nil {
-			panic(err)
-		}
-		defer f.Close()
-
+	go func() {
 		i := 0
-		for {
-			_, err := f.WriteString(fmt.Sprintf("hello %v\n", i))
-			i += 1
-			if err != nil {
-				panic(err)
-			}
-			f.Sync()
+		mu := sync.Mutex{}
+		clients := map[string]*net.UnixAddr{}
 
-			timeout := time.After(100 * time.Millisecond)
+		go func() {
+			buf := make([]byte, 1)
+			for {
+				_, addr, err := p.ReadFromUnix(buf)
+				if errors.Is(err, net.ErrClosed) {
+					return
+				}
+				if err != nil {
+					panic(err)
+				}
+				mu.Lock()
+				if buf[0] == 1 {
+					// connect
+					clients[addr.String()] = addr
+				} else {
+					// disconnect
+					delete(clients, addr.String())
+				}
+				mu.Unlock()
+			}
+		}()
+
+		for {
+			mu.Lock()
+			for _, c := range clients {
+				_, err := p.WriteToUnix(fmt.Appendf(nil, "hello %v\n", i), c)
+				if err != nil {
+					delete(clients, c.String())
+				}
+			}
+			mu.Unlock()
+			i += 1
+
+			timeout := time.After(500 * time.Millisecond)
 			select {
 			case <-timeout:
 				continue
@@ -69,7 +76,40 @@ func main() {
 				return
 			}
 		}
-	}(ctx)
+	}()
+
+	for i := range 3 {
+		go func(i int) {
+			name := fmt.Sprintf("test_%v.sock", i)
+			p, err := net.DialUnix("unixgram",
+				&net.UnixAddr{Name: name, Net: "unixgram"},
+				&net.UnixAddr{Name: "test.sock", Net: "unixgram"})
+			if err != nil {
+				panic(err)
+			}
+			defer p.Close()
+			defer os.Remove(name)
+
+			// send connect
+			_, err = p.Write([]byte{1})
+			if err != nil {
+				panic(err)
+			}
+			// defer p.Write([]byte{0})
+
+			fmt.Printf("start [%v]\n", i)
+
+			scanner := bufio.NewScanner(p)
+			for scanner.Scan() {
+				line := scanner.Text()
+				fmt.Printf("Recv [%v]: %v\n", i, line)
+			}
+			if err := scanner.Err(); err != nil {
+				fmt.Printf("error [%v]: %v\n", i, err)
+			}
+		}(i)
+		time.Sleep(1 * time.Second)
+	}
 
 	time.Sleep(3 * time.Second)
 	cancel()
