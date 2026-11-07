@@ -35,3 +35,9 @@ Temperature
         more than 23 C (73.5F)
 Brightness:
     measurements: (arbitrary - relative measure, range TBD)
+
+
+Virtual webcam in linux:
+v4l2loopback
+ffmpeg -loop 1 -re -i ~/Downloads/Lenna_\(test_image\).png -f v4l2 -vcodec rawvideo -pix_fmt yuv420p /dev/video0
+sudo modprobe v4l2loopback devices=1 max_buffers=2 exclusive_caps=1 card_label=VirtualCam
