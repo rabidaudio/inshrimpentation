@@ -1,120 +1,85 @@
 package main
 
 import (
-	"bufio"
+	"bytes"
 	"context"
-	"errors"
-	"fmt"
+	"io"
 	"log"
-	"net"
 	"os"
-	"sync"
+	"os/exec"
+	"strings"
+	"syscall"
 	"time"
-
-	"github.com/rabidaudio/inshrimpentation/api"
 )
 
 func main() {
-	log.Printf("starting server, env: %v\n", api.Env())
 
-	var err error
+	ctx, _ := context.WithCancel(context.Background())
 
-	ctx, cancel := context.WithCancel(context.Background())
+	path := "test.mp4"
 
-	p, err := net.ListenUnixgram("unixgram", &net.UnixAddr{Name: "test.sock", Net: "unixgram"})
+	// f, err := os.Create(path)
+	// if err != nil {
+	// 	panic(err)
+	// }
+	// defer f.Close()
+
+	if err := syscall.Mkfifo(path, 0666); err != nil && !os.IsExist(err) {
+		panic(err)
+	}
+	defer os.Remove(path)
+
+	args := []string{
+		"-f", "avfoundation",
+		"-framerate", "30",
+		"-video_size", "640x480",
+		"-i", "0",
+		"-pix_fmt", "uyvy422",
+		"-b:v", "800k",
+		"-t", "10",
+		"-an", "-y",
+		path,
+	}
+
+	log.Printf("ffmpeg %v\n", strings.Join(args, " "))
+
+	cmd := exec.CommandContext(ctx, "ffmpeg", args...)
+	err = cmd.Start()
 	if err != nil {
 		panic(err)
 	}
-	defer p.Close()
-	defer os.Remove("test.sock")
 
-	// writer
+	f, err := os.OpenFile(path, os.O_RDONLY, os.ModeNamedPipe)
+	if err != nil {
+		panic(err)
+	}
+	defer f.Close()
+
+	done := make(chan bool)
+
 	go func() {
-		i := 0
-		mu := sync.Mutex{}
-		clients := map[string]*net.UnixAddr{}
-
-		go func() {
-			buf := make([]byte, 1)
-			for {
-				_, addr, err := p.ReadFromUnix(buf)
-				if errors.Is(err, net.ErrClosed) {
-					return
-				}
-				if err != nil {
-					panic(err)
-				}
-				mu.Lock()
-				if buf[0] == 1 {
-					// connect
-					clients[addr.String()] = addr
-				} else {
-					// disconnect
-					delete(clients, addr.String())
-				}
-				mu.Unlock()
-			}
-		}()
-
-		for {
-			mu.Lock()
-			for _, c := range clients {
-				_, err := p.WriteToUnix(fmt.Appendf(nil, "hello %v\n", i), c)
-				if err != nil {
-					delete(clients, c.String())
-				}
-			}
-			mu.Unlock()
-			i += 1
-
-			timeout := time.After(500 * time.Millisecond)
-			select {
-			case <-timeout:
-				continue
-			case <-ctx.Done():
-				fmt.Println("context closed")
-				return
-			}
-		}
+		time.Sleep(5 * time.Second)
+		cmd.Cancel()
+		done <- true
 	}()
 
-	for i := range 3 {
-		go func(i int) {
-			name := fmt.Sprintf("test_%v.sock", i)
-			p, err := net.DialUnix("unixgram",
-				&net.UnixAddr{Name: name, Net: "unixgram"},
-				&net.UnixAddr{Name: "test.sock", Net: "unixgram"})
-			if err != nil {
-				panic(err)
-			}
-			defer p.Close()
-			defer os.Remove(name)
-
-			// send connect
-			_, err = p.Write([]byte{1})
-			if err != nil {
-				panic(err)
-			}
-			// defer p.Write([]byte{0})
-
-			fmt.Printf("start [%v]\n", i)
-
-			scanner := bufio.NewScanner(p)
-			for scanner.Scan() {
-				line := scanner.Text()
-				fmt.Printf("Recv [%v]: %v\n", i, line)
-			}
-			if err := scanner.Err(); err != nil {
-				fmt.Printf("error [%v]: %v\n", i, err)
-			}
-		}(i)
-		time.Sleep(1 * time.Second)
+	var buf bytes.Buffer
+	_, err = buf.ReadFrom(f)
+	if err != nil {
+		panic(err)
 	}
 
-	time.Sleep(3 * time.Second)
-	cancel()
-	time.Sleep(1 * time.Second)
+	<-done
 
+	f2, err := os.Create("test2.mp4")
+	if err != nil {
+		panic(err)
+	}
+	defer f2.Close()
+
+	io.Copy(f2, &buf)
+
+	// log.Printf("starting server, env: %v\n", api.Env())
 	// db, err := database.Init()
 	// if err != nil {
 	// 	log.Fatalf("unable to start database: %v\n", err)
