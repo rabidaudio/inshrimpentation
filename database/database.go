@@ -18,6 +18,11 @@ type DB struct {
 	*sql.DB
 }
 
+var tables = []string{
+	createMeasurementSQL,
+	createConfigSQL,
+}
+
 func path() string {
 	env := api.Env()
 	dir := ""
@@ -58,9 +63,11 @@ func Create() error {
 	defer db.Close()
 
 	// create tables
-	_, err = db.Exec(createMeasurementSQL)
-	if err != nil {
-		return err
+	for _, sql := range tables {
+		_, err = db.Exec(sql)
+		if err != nil {
+			return err
+		}
 	}
 
 	return nil

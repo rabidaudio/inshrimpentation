@@ -19,12 +19,14 @@ type MeasurementType string
 const (
 	WaterLevel  MeasurementType = "water_level"
 	Temperature MeasurementType = "temperature"
+
+	Snapshot MeasurementType = "snapshot"
 )
 
 type Measurement struct {
-	time            time.Time
-	measurementType MeasurementType
-	value           float64
+	Time            time.Time
+	MeasurementType MeasurementType
+	Value           float64
 }
 
 func (db *DB) Record(ctx context.Context, m Measurement) error {

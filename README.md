@@ -10,8 +10,8 @@ https://periph.io/project/design/
 Live stream is handled out-of-band using mediamtx
 https://mediamtx.org/docs/read/web-browsers#embed-in-a-website
 
-build raspberry pi image with [rpi-image-gen](https://github.com/raspberrypi/rpi-image-gen)
-set cron job to capture/update data
+build raspberry pi image using cloud-init and firstrun.sh
+https://www.raspberrypi.com/news/cloud-init-on-raspberry-pi-os/
 
 
 db:

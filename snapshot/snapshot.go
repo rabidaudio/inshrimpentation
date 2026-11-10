@@ -6,6 +6,8 @@ import (
 
 	"github.com/vladimirvivien/go4vl/device"
 	"github.com/vladimirvivien/go4vl/v4l2"
+
+	_ "image/jpeg"
 )
 
 func Capture() (image.Image, error) {
