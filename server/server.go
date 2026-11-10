@@ -1,15 +1,12 @@
 package server
 
 import (
-	"io"
-	"log"
 	"net/http"
 	"time"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/rabidaudio/inshrimpentation/api"
 	"github.com/rabidaudio/inshrimpentation/database"
-	"github.com/rabidaudio/inshrimpentation/live"
 )
 
 type RouteBuilder func(r chi.Router)
@@ -39,18 +36,6 @@ func NewServer(db *database.DB) http.Handler {
 	// serve static files from dist outside of /api path
 	s := chi.NewRouter()
 	s.Mount("/api", r)
-	s.Get("/live.mp4", func(rw http.ResponseWriter, req *http.Request) {
-		r, wait, err := live.Stream(req.Context())
-		if err != nil {
-			log.Printf("error opening stream: %v", err)
-			rw.WriteHeader(500)
-		} else {
-			rw.Header().Set("Content-Type", "video/mp4")
-			rw.WriteHeader(200)
-			io.Copy(rw, r)
-			wait()
-		}
-	})
 	s.Mount("/", http.FileServer(http.Dir("frontend/dist")))
 	return s
 }

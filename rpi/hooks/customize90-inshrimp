@@ -1,0 +1,9 @@
+#!/bin/bash
+
+set -eu
+
+# chroot $1 sh -c "apt-get -y install network-manager"
+cp ../sshdkeepalive.conf $1/etc/sshd_config.d/
+# chroot $1 sh -c "nmcli --offline connection add type wifi ssid $SSID wifi-sec.psk $PSK wifi-sec.key-mgmt wpa-psk autoconnect yes > /etc/NetworkManager/system-connections/$SSID.nmconnection"
+# chroot $1 sh -c "chmod 600 /etc/NetworkManager/system-connections/wlan.nmconnection"
+
