@@ -15,9 +15,9 @@ func TestMeasurements(t *testing.T) {
 	defer db.Wipe()
 
 	m := Measurement{
-		time:            time.Date(2026, 11, 1, 15, 00, 00, 00, time.UTC),
-		measurementType: WaterLevel,
-		value:           8.5,
+		Time:            time.Date(2026, 11, 1, 15, 00, 00, 00, time.UTC),
+		MeasurementType: WaterLevel,
+		Value:           8.5,
 	}
 
 	err = db.Record(t.Context(), m)

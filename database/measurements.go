@@ -30,7 +30,10 @@ type Measurement struct {
 }
 
 func (db *DB) Record(ctx context.Context, m Measurement) error {
-	_, err := db.ExecContext(ctx, "INSERT INTO measurements (time, type, value) VALUES (?, ?, ?)", m.time, string(m.measurementType), m.value)
+	_, err := db.ExecContext(ctx,
+		`INSERT INTO measurements (time, type, value)
+		VALUES (?, ?, ?)`,
+		m.Time, string(m.MeasurementType), m.Value)
 	if err != nil {
 		return fmt.Errorf("db: create measurement: %w", err)
 	}
@@ -38,7 +41,10 @@ func (db *DB) Record(ctx context.Context, m Measurement) error {
 }
 
 func (db *DB) GetMeasurements(ctx context.Context, mt MeasurementType, timeRange [2]time.Time) ([]Measurement, error) {
-	rows, err := db.QueryContext(ctx, "SELECT time, type, value FROM measurements WHERE type = ? AND time >= ? and time < ? ORDER BY TIME ASC", mt, timeRange[0], timeRange[1])
+	rows, err := db.QueryContext(ctx,
+		`SELECT time, type, value FROM measurements
+		WHERE type = ? AND time >= ? and time < ? ORDER BY TIME ASC`,
+		mt, timeRange[0], timeRange[1])
 	if err != nil {
 		return nil, err
 	}
@@ -47,7 +53,7 @@ func (db *DB) GetMeasurements(ctx context.Context, mt MeasurementType, timeRange
 	var results []Measurement
 	for rows.Next() {
 		var m Measurement
-		if err := rows.Scan(&m.time, &m.measurementType, &m.value); err != nil {
+		if err := rows.Scan(&m.Time, &m.MeasurementType, &m.Value); err != nil {
 			return nil, fmt.Errorf("db: query measurements: %w", err)
 		}
 		results = append(results, m)

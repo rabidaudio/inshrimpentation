@@ -22,7 +22,8 @@ type Config struct {
 }
 
 func (db *DB) GetConfigs(ctx context.Context) ([]Config, error) {
-	rows, err := db.QueryContext(ctx, "SELECT type, interval, last_completed FROM configs ORDER BY last_completed ASC")
+	rows, err := db.QueryContext(ctx,
+		`SELECT type, interval, last_completed FROM configs ORDER BY last_completed ASC`)
 	if err != nil {
 		return nil, err
 	}
@@ -43,8 +44,8 @@ func (db *DB) GetConfigs(ctx context.Context) ([]Config, error) {
 }
 
 func (db *DB) SetInterval(ctx context.Context, mt MeasurementType, i time.Duration) error {
-	_, err := db.ExecContext(ctx, `
-		INSERT INTO configs (type, interval) VALUES (?, ?)
+	_, err := db.ExecContext(ctx,
+		`INSERT INTO configs (type, interval) VALUES (?, ?)
 		ON CONFLICT(type) DO UPDATE SET interval = ?`, string(mt), int64(i), int64(i))
 	if err != nil {
 		return fmt.Errorf("db: upsert configs: %w", err)
@@ -53,8 +54,8 @@ func (db *DB) SetInterval(ctx context.Context, mt MeasurementType, i time.Durati
 }
 
 func (db *DB) TrackRun(ctx context.Context, mt MeasurementType, runat time.Time) error {
-	_, err := db.ExecContext(ctx, `
-		UPDATE configs SET last_completed = ?
+	_, err := db.ExecContext(ctx,
+		`UPDATE configs SET last_completed = ?
 		WHERE type = ?`, runat, string(mt))
 	if err != nil {
 		return fmt.Errorf("db: update configs: %w", err)
