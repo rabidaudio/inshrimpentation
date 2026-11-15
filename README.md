@@ -12,6 +12,11 @@ https://mediamtx.org/docs/read/web-browsers#embed-in-a-website
 
 build raspberry pi image using cloud-init and firstrun.sh
 https://www.raspberrypi.com/news/cloud-init-on-raspberry-pi-os/
+Alternatively: https://gokrazy.org (mediamtx is go and should work; hypothetically ffmpeg can be statically compiled and loaded?)
+https://inshrimp.lan:8892/cam/
+```bash
+gok add github.com/bluenviron/mediamtx
+```
 
 
 db:
