@@ -1,6 +1,15 @@
 package instruments
 
-// returns water level in inches
+import (
+	"periph.io/x/devices/v3/ads1x15"
+)
+
+// WaterLevel in inches
 func WaterLevel() (float64, error) {
-	return 8.5, nil // TODO
+	raw, err := readAdc(ads1x15.Channel0, 16)
+	if err != nil {
+		return 0, err
+	}
+	// TODO: convert resistance to inches
+	return float64(raw), nil
 }
