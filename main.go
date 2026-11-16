@@ -1,109 +1,71 @@
 package main
 
 import (
+	"context"
+	"errors"
+	"flag"
 	"fmt"
-	"time"
+	"log"
+	"net/http"
+	"os"
 
-	"periph.io/x/conn/v3/onewire"
-	"periph.io/x/conn/v3/onewire/onewirereg"
-	"periph.io/x/conn/v3/physic"
-	"periph.io/x/devices/v3/ds18b20"
-	"periph.io/x/host/v3"
+	"github.com/rabidaudio/inshrimpentation/api"
+	"github.com/rabidaudio/inshrimpentation/database"
+	"github.com/rabidaudio/inshrimpentation/instruments"
+	"github.com/rabidaudio/inshrimpentation/server"
 )
 
 func main() {
-	h, err := host.Init()
-	if err != nil {
-		panic(err)
+	cmd := flag.Arg(0)
+	switch cmd {
+	case "serve":
+		serve()
+	case "measure":
+		measure()
+	case "cron":
+		cron()
+	default:
+		log.Fatalf("Command required. Supported commands: serve, cron")
 	}
-	fmt.Printf("loaded devices: %v\n", h.Loaded)
-	fmt.Printf("skipped devices: %v\n", h.Skipped)
-	fmt.Printf("failed devices: %v\n", h.Failed)
-
-	fmt.Printf("one wire ifaces: %v\n", onewirereg.All())
-
-	b, err := onewirereg.Open("") // open default 1-wire interface
-	if err != nil {
-		panic(err)
-	}
-	defer b.Close()
-
-	addrs, err := b.Search(false) // search for all devices
-	if err != nil {
-		panic(err)
-	}
-	fmt.Printf("all devices:\n")
-	for _, a := range addrs {
-		fmt.Printf("%x", a)
-	}
-
-	addr, ok := findTempSensor(addrs)
-	if !ok {
-		panic(fmt.Errorf("instruments: temperature sensor not found"))
-	}
-	fmt.Printf("address: %v\n", addr)
-
-	d, err := ds18b20.New(b, addr, 12) // connect using 12-bit resolution
-	if err != nil {
-		panic(err)
-	}
-	var temp physic.Env
-
-	for {
-		err = d.Sense(&temp) // blocking read temp
-		if err != nil {
-			panic(err)
-		}
-		fmt.Printf("temperature: %v C\n", temp.Temperature.Celsius())
-		time.Sleep(1000)
-	}
-
-	// cmd := flag.Arg(0)
-	// switch cmd {
-	// case "serve":
-	// 	serve()
-	// case "cron":
-	// 	cron()
-	// default:
-	// 	log.Fatalf("Command required. Supported commands: serve, cron")
-	// }
 }
 
-func findTempSensor(addrs []onewire.Address) (onewire.Address, bool) {
-	for _, addr := range addrs {
-		fam := ds18b20.Family(addr)
-		if fam == ds18b20.DS18B20 {
-			return addr, true
+func serve() {
+	log.Printf("starting server, env: %v\n", api.Env())
+	db, err := database.Init()
+	if err != nil {
+		log.Fatalf("unable to start database: %v\n", err)
+	}
+	defer db.Close()
+
+	s := server.NewServer(db)
+
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8080"
+	}
+	addr := "localhost:" + port
+	fmt.Printf("Starting server on %v\n", addr)
+	err = http.ListenAndServe(addr, s)
+	if err != nil {
+		if errors.Is(err, http.ErrServerClosed) {
+			fmt.Printf("server shutdown\n")
+		} else {
+			log.Fatalf("unable to start server: %v\n", err)
 		}
 	}
-	return 0, false
 }
 
-// func serve() {
-// 	log.Printf("starting server, env: %v\n", api.Env())
-// 	db, err := database.Init()
-// 	if err != nil {
-// 		log.Fatalf("unable to start database: %v\n", err)
-// 	}
-// 	defer db.Close()
+func measure() {
+	ctx := context.Background()
 
-// 	s := server.NewServer(db)
-
-// 	port := os.Getenv("PORT")
-// 	if port == "" {
-// 		port = "8000"
-// 	}
-// 	addr := "localhost:" + port
-// 	fmt.Printf("Starting server on %v\n", addr)
-// 	err = http.ListenAndServe(addr, s)
-// 	if err != nil {
-// 		if errors.Is(err, http.ErrServerClosed) {
-// 			fmt.Printf("server shutdown\n")
-// 		} else {
-// 			log.Fatalf("unable to start server: %v\n", err)
-// 		}
-// 	}
-// }
+	mm, err := instruments.Measure(ctx)
+	if err != nil {
+		log.Fatalf("measure: %v\n", err)
+	}
+	for _, m := range mm {
+		log.Printf("[%v] %v: %v\n", m.Time, m.MeasurementType, m.Formatted())
+	}
+}
 
 func cron() {
 	// TODO

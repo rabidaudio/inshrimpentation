@@ -3,6 +3,7 @@ package instruments
 import (
 	"fmt"
 
+	"periph.io/x/conn/v3/onewire"
 	"periph.io/x/conn/v3/onewire/onewirereg"
 	"periph.io/x/conn/v3/physic"
 	"periph.io/x/devices/v3/ds18b20"
@@ -28,11 +29,10 @@ func Temperature() (float64, error) {
 	if err != nil {
 		return 0, err
 	}
-	// TODO: assumes only one device on bus
-	if len(addrs) < 1 {
+	addr, ok := findTempSensor(addrs)
+	if !ok {
 		return 0, fmt.Errorf("instruments: temperature sensor not found")
 	}
-	addr := addrs[0]
 
 	d, err := ds18b20.New(b, addr, 12) // connect using 12-bit resolution
 	if err != nil {
@@ -45,4 +45,14 @@ func Temperature() (float64, error) {
 		return 0, err
 	}
 	return temp.Temperature.Celsius(), nil
+}
+
+func findTempSensor(addrs []onewire.Address) (onewire.Address, bool) {
+	for _, addr := range addrs {
+		fam := ds18b20.Family(addr)
+		if fam == ds18b20.DS18B20 {
+			return addr, true
+		}
+	}
+	return 0, false
 }

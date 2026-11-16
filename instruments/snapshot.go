@@ -31,6 +31,5 @@ func Snapshot() (float64, error) {
 		return 0, err
 	}
 
-	// return float64(t), nil
-	return 0, fmt.Errorf("unimplemented")
+	return float64(t), nil
 }

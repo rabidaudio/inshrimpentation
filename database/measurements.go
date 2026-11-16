@@ -29,7 +29,20 @@ type Measurement struct {
 	Value           float64
 }
 
-func (db *DB) Record(ctx context.Context, m Measurement) error {
+func (m *Measurement) Formatted() string {
+	switch m.MeasurementType {
+	case WaterLevel:
+		return fmt.Sprintf("%v inches", m.Value)
+	case Temperature:
+		return fmt.Sprintf("%v °C", m.Value)
+	case Snapshot:
+		return fmt.Sprintf("snapshots/%v.jpg", int(m.Value))
+	default:
+		panic(fmt.Errorf("unsupported type: %v", m.MeasurementType))
+	}
+}
+
+func (db *DB) Record(ctx context.Context, m *Measurement) error {
 	_, err := db.ExecContext(ctx,
 		`INSERT INTO measurements (time, type, value)
 		VALUES (?, ?, ?)`,

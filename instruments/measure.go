@@ -19,45 +19,49 @@ var instruments = map[database.MeasurementType]Instrument{
 	database.Snapshot: Snapshot,
 }
 
-func Measure(ctx context.Context) error {
+func Measure(ctx context.Context) ([]*database.Measurement, error) {
 	t := time.Now()
 
 	db := database.GetDB(ctx)
 	conf, err := db.GetConfigs(ctx)
 	if err != nil {
-		return err
+		return nil, err
 	}
+
+	var measurements []*database.Measurement
 
 	for _, c := range conf {
 		if time.Since(c.LastCompleted) < c.Interval {
 			continue // not time to run yet
 		}
-		err = runTest(ctx, db, c, t)
+		m, err := runTest(ctx, db, c, t)
 		if err != nil {
 			// log warning and continue
 			// TODO: alarm
 			log.Printf("instruments: error running %v: %v", c.MeasurementType, err)
 		}
+		measurements = append(measurements, m)
 	}
 
 	// TODO: trigger alarms
 	// TODO: alarm for time since filter/water clean
 
-	return nil
+	return measurements, nil
 }
 
-func runTest(ctx context.Context, db *database.DB, c database.Config, t time.Time) error {
+func runTest(ctx context.Context, db *database.DB, c database.Config, t time.Time) (m *database.Measurement, err error) {
 	i, ok := instruments[c.MeasurementType]
 	if !ok {
-		return fmt.Errorf("todo handle %v", c.MeasurementType)
+		return m, fmt.Errorf("todo handle %v", c.MeasurementType)
 	}
+	m.Time = time.Now()
+	m.MeasurementType = c.MeasurementType
 	v, err := i()
 	if err != nil {
-		return err
+		return
 	}
-	return db.Record(ctx, database.Measurement{
-		Time:            time.Now(),
-		Value:           v,
-		MeasurementType: c.MeasurementType,
-	})
+
+	m.Value = v
+	err = db.Record(ctx, m)
+	return
 }
