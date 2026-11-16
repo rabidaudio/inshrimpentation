@@ -4581,6 +4581,16 @@
 		)
 		(uuid "d0d37cc3-d299-42a8-9fd6-c3e628ba1a05")
 	)
+	(text "102-6146-ND"
+		(exclude_from_sim no)
+		(at 189.23 34.29 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+		(uuid "d73392f5-654e-4898-b833-fbd3a4ee4165")
+	)
 	(text "TEMPERATURE"
 		(exclude_from_sim no)
 		(at 189.23 49.53 0)
@@ -4700,6 +4710,94 @@
 		(diameter 0)
 		(color 0 0 0 0)
 		(uuid "d0f8bbb0-36a8-457c-b29a-936d290731c1")
+	)
+	(no_connect
+		(at 29.21 66.04)
+		(uuid "029382c7-cb6a-4fdf-b376-80cefae9e4da")
+	)
+	(no_connect
+		(at 29.21 73.66)
+		(uuid "06a9e575-ded2-469d-991c-f4d0395920c9")
+	)
+	(no_connect
+		(at 95.25 78.74)
+		(uuid "11018e0a-0bc5-417a-8554-3c097faeaa62")
+	)
+	(no_connect
+		(at 95.25 71.12)
+		(uuid "11f62429-70df-4363-b14e-0fb1eb8a89b2")
+	)
+	(no_connect
+		(at 29.21 71.12)
+		(uuid "1654909a-15a1-421c-a1e6-2ec5d40ba087")
+	)
+	(no_connect
+		(at 95.25 55.88)
+		(uuid "339ff3da-1b84-4bb4-b490-33af03e0d71e")
+	)
+	(no_connect
+		(at 29.21 81.28)
+		(uuid "3b83e0d9-67e3-4a3c-b237-b3505b109ba5")
+	)
+	(no_connect
+		(at 95.25 86.36)
+		(uuid "42491462-a609-4c36-af6d-853be785d2d1")
+	)
+	(no_connect
+		(at 29.21 88.9)
+		(uuid "458a242d-8936-42d3-9942-92dfc4b9b9b3")
+	)
+	(no_connect
+		(at 29.21 68.58)
+		(uuid "4bba2856-f436-47ef-8739-d0b8fffbe12e")
+	)
+	(no_connect
+		(at 29.21 53.34)
+		(uuid "5c2bf9e8-da40-449d-87c5-8c3d8fc6aced")
+	)
+	(no_connect
+		(at 29.21 78.74)
+		(uuid "5d5f4154-0f3f-4442-97b4-3b01e3035c62")
+	)
+	(no_connect
+		(at 95.25 53.34)
+		(uuid "5e2802b3-b6a5-484e-975f-df8fa9ae41fb")
+	)
+	(no_connect
+		(at 29.21 63.5)
+		(uuid "705a6c40-3c8a-454d-9686-382a31598695")
+	)
+	(no_connect
+		(at 29.21 60.96)
+		(uuid "74187c7a-ec42-45fd-b35b-c2b446510ec3")
+	)
+	(no_connect
+		(at 29.21 83.82)
+		(uuid "7ae5dd1b-d7a2-4025-a268-7da1c14f41cf")
+	)
+	(no_connect
+		(at 95.25 81.28)
+		(uuid "9002a22d-e189-4411-8447-cbd7bd669e66")
+	)
+	(no_connect
+		(at 29.21 86.36)
+		(uuid "91d141d7-aee2-478e-93e9-1e2e9a0c651a")
+	)
+	(no_connect
+		(at 29.21 91.44)
+		(uuid "99be20b9-8c5b-4ece-90d6-8bd01b988e4f")
+	)
+	(no_connect
+		(at 95.25 83.82)
+		(uuid "a7b8b7f7-81be-4ccf-b484-b56c4f2ef627")
+	)
+	(no_connect
+		(at 29.21 55.88)
+		(uuid "c848655d-b0a1-4e3f-9eb6-dfbd4fe4271e")
+	)
+	(no_connect
+		(at 95.25 88.9)
+		(uuid "ec23983d-0f71-41a6-8b40-699173e7839c")
 	)
 	(wire
 		(pts
@@ -5150,16 +5248,6 @@
 			(type default)
 		)
 		(uuid "5318b7b2-4ad4-4ac4-9e7a-e0e0f344d286")
-	)
-	(wire
-		(pts
-			(xy 195.58 118.11) (xy 195.58 115.57)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "53959c78-ecba-4d58-a774-024d64230ea5")
 	)
 	(wire
 		(pts
@@ -5833,6 +5921,16 @@
 	)
 	(wire
 		(pts
+			(xy 199.39 118.11) (xy 199.39 120.65)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "f4f1348d-72c6-4419-996a-679210e4ef0f")
+	)
+	(wire
+		(pts
 			(xy 96.52 45.72) (xy 95.25 45.72)
 		)
 		(stroke
@@ -6439,7 +6537,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" "Connector_PinSocket_2.54mm:PinSocket_1x03_P2.54mm_Vertical"
+		(property "Footprint" "_project:CUI_TB002-500-03BE"
 			(at 260.35 72.39 0)
 			(effects
 				(font
@@ -7516,7 +7614,7 @@
 				(justify right)
 			)
 		)
-		(property "Footprint" "Connector_PinSocket_2.54mm:PinSocket_1x03_P2.54mm_Vertical"
+		(property "Footprint" "_project:CUI_TB002-500-03BE"
 			(at 293.37 35.56 0)
 			(effects
 				(font
@@ -7796,7 +7894,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" "Connector_PinSocket_2.54mm:PinSocket_1x04_P2.54mm_Vertical"
+		(property "Footprint" "Connector_PinHeader_2.54mm:PinHeader_1x04_P2.54mm_Horizontal"
 			(at 271.145 135.89 0)
 			(effects
 				(font
@@ -8547,7 +8645,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Connector_IDC:IDC-Header_2x03_P2.54mm_Vertical"
+		(property "Footprint" ""
 			(at 212.09 138.43 0)
 			(effects
 				(font
@@ -9758,7 +9856,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Connector_IDC:IDC-Header_2x03_P2.54mm_Vertical"
+		(property "Footprint" ""
 			(at 212.09 125.73 0)
 			(effects
 				(font
