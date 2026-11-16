@@ -18,6 +18,11 @@ https://inshrimp.lan:8892/cam/
 gok add github.com/bluenviron/mediamtx
 ```
 
+static ip
+```bash
+sudo nmcli connection modify "netplan-wlan0-The Coven" ipv4.addresses 192.168.1.124/24 ipv4.gateway 192.168.1.1 ipv4.dns 192.168.1.1 ipv4.method manual
+```
+
 
 db:
     sqlite db for storing measurements, configs

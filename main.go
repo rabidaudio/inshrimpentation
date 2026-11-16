@@ -2,27 +2,37 @@ package main
 
 import (
 	"errors"
-	"flag"
 	"fmt"
 	"log"
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/rabidaudio/inshrimpentation/api"
 	"github.com/rabidaudio/inshrimpentation/database"
+	"github.com/rabidaudio/inshrimpentation/instruments"
 	"github.com/rabidaudio/inshrimpentation/server"
 )
 
 func main() {
-	cmd := flag.Arg(0)
-	switch cmd {
-	case "serve":
-		serve()
-	case "cron":
-		cron()
-	default:
-		log.Fatalf("Command required. Supported commands: serve, cron")
+	for {
+		t, err := instruments.Temperature()
+		if err != nil {
+			panic(err)
+		}
+		fmt.Printf("temperature: %v C", t)
+		time.Sleep(1000)
 	}
+
+	// cmd := flag.Arg(0)
+	// switch cmd {
+	// case "serve":
+	// 	serve()
+	// case "cron":
+	// 	cron()
+	// default:
+	// 	log.Fatalf("Command required. Supported commands: serve, cron")
+	// }
 }
 
 func serve() {
