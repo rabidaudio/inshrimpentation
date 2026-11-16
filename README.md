@@ -21,6 +21,23 @@ gok add github.com/bluenviron/mediamtx
 static ip
 ```bash
 sudo nmcli connection modify "netplan-wlan0-The Coven" ipv4.addresses 192.168.1.124/24 ipv4.gateway 192.168.1.1 ipv4.dns 192.168.1.1 ipv4.method manual
+
+
+go run ./build
+diskutil list
+sudo diskutil unmountDisk /dev/disk4
+gok --instance shrimp overwrite --full /dev/disk4 --target_storage_bytes 31266439168
+
+# initialize the default gokrazy image
+# NOTE: doesn't run well on macos, did inside a VM
+go install github.com/gokrazy/tools/cmd/gok@main
+gok new -i shrimp
+gok -i shrimp overwrite --full gokrazy_default.img --target_storage_bytes 31266439168
+
+sudo dd if=gokrazy_default.img of=/dev/disk4
+
+gok -i shrimp add github.com/gokrazy/mkfs
+gok -i shrimp run
 ```
 
 

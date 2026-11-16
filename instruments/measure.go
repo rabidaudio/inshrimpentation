@@ -12,8 +12,8 @@ import (
 type Instrument func() (float64, error)
 
 var instruments = map[database.MeasurementType]Instrument{
-	database.WaterLevel: WaterLevel,
-	// database.Temperature
+	database.WaterLevel:  WaterLevel,
+	database.Temperature: Temperature,
 	// database.Brightness
 	// database.Algae
 	database.Snapshot: Snapshot,

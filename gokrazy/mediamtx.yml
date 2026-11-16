@@ -1,0 +1,12 @@
+moq: true
+moqHTTP2Address: :8892
+moqHTTP3Address: :8892
+moqQUICAddress: :8893
+moqAllowOrigins: ["*"]
+
+paths:
+  cam:
+    source: rpiCamera
+    rpiCameraWidth: 640
+    rpiCameraHeight: 480
+    rpiCameraFPS: 15
