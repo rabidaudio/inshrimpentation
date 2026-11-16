@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"time"
 
+	"periph.io/x/conn/v3/onewire"
 	"periph.io/x/conn/v3/onewire/onewirereg"
 	"periph.io/x/conn/v3/physic"
 	"periph.io/x/devices/v3/ds18b20"
@@ -31,11 +32,16 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	// TODO: assumes only one device on bus
-	if len(addrs) < 1 {
+	fmt.Printf("all devices:\n")
+	for _, a := range addrs {
+		fmt.Printf("%x", a)
+	}
+
+	addr, ok := findTempSensor(addrs)
+	if !ok {
 		panic(fmt.Errorf("instruments: temperature sensor not found"))
 	}
-	addr := addrs[0]
+	fmt.Printf("address: %v\n", addr)
 
 	d, err := ds18b20.New(b, addr, 12) // connect using 12-bit resolution
 	if err != nil {
@@ -48,7 +54,7 @@ func main() {
 		if err != nil {
 			panic(err)
 		}
-		fmt.Printf("temperature: %v C", temp.Temperature.Celsius())
+		fmt.Printf("temperature: %v C\n", temp.Temperature.Celsius())
 		time.Sleep(1000)
 	}
 
@@ -61,6 +67,16 @@ func main() {
 	// default:
 	// 	log.Fatalf("Command required. Supported commands: serve, cron")
 	// }
+}
+
+func findTempSensor(addrs []onewire.Address) (onewire.Address, bool) {
+	for _, addr := range addrs {
+		fam := ds18b20.Family(addr)
+		if fam == ds18b20.DS18B20 {
+			return addr, true
+		}
+	}
+	return 0, false
 }
 
 // func serve() {
