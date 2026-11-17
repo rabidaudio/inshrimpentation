@@ -2,6 +2,8 @@ github.com/blackjack/webcam v0.6.2 h1:dp+WsZzibSBqJ2GJwtqaJu0zsAseAlyASovhaaFpxh
 github.com/blackjack/webcam v0.6.2/go.mod h1:zs+RkUZzqpFPHPiwBZ6U5B34ZXXe9i+SiHLKnnukJuI=
 github.com/go-chi/chi/v5 v5.5.0 h1:xdKQ1dJmVJsmgahrXSKhUx8NyVPzpwdlyrrQFpMPJgg=
 github.com/go-chi/chi/v5 v5.5.0/go.mod h1:d1IG7GtKPSjPyBP365PH8sAGVHk3qfB/IhjFNRH1wWM=
+github.com/go-chi/httplog/v3 v3.5.0 h1:QTd0cRZGznBMC1J9hm4reEfgneV92hvSHOoPR97f/aE=
+github.com/go-chi/httplog/v3 v3.5.0/go.mod h1:tDhJo9G+F4mioDgX4pKbyA0uVZwCtHejoSsDkvJkFkU=
 github.com/mattn/go-sqlite3 v1.14.53 h1:mnTM0owzUMrKuLo+0w51NUiB0ir2Fo7kFXlPt/l3BGs=
 github.com/mattn/go-sqlite3 v1.14.53/go.mod h1:6JTjA44L93a0QCyJef5YvlPoKXntQPjzWv5gtm9sB6w=
 github.com/stretchr/testify v1.12.1 h1:EuwCh5fleGS7H32xRwO3wRGT7DxrDhLAT6FF8MpWDWE=

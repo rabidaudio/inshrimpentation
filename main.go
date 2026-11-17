@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"errors"
-	"flag"
 	"fmt"
 	"log"
 	"net/http"
@@ -16,7 +15,10 @@ import (
 )
 
 func main() {
-	cmd := flag.Arg(0)
+	var cmd string
+	if len(os.Args) >= 2 {
+		cmd = os.Args[1]
+	}
 	switch cmd {
 	case "serve":
 		serve()
