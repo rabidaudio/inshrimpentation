@@ -11,7 +11,7 @@ import (
 	"os"
 
 	_ "github.com/mattn/go-sqlite3"
-	"github.com/rabidaudio/inshrimpentation/api"
+	"github.com/rabidaudio/api/env"
 )
 
 type DB struct {
@@ -24,12 +24,12 @@ var tables = []string{
 }
 
 func path() string {
-	env := api.Env()
+	e := env.Env()
 	dir := ""
-	if env == api.Test {
+	if e == env.Test {
 		dir = "../"
 	}
-	return fmt.Sprintf("%vstorage/database_%v.db", dir, env)
+	return fmt.Sprintf("%vstorage/database_%v.db", dir, e)
 }
 
 func Init() (*DB, error) {
@@ -74,7 +74,7 @@ func Create() error {
 }
 
 func (db *DB) Wipe() {
-	if !api.IsEnv(api.Test) {
+	if !env.IsTest() {
 		panic("Don't wipe real database")
 	}
 	err := os.Remove(path())

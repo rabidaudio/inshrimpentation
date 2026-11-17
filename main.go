@@ -8,7 +8,7 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/rabidaudio/inshrimpentation/api"
+	"github.com/rabidaudio/api/env"
 	"github.com/rabidaudio/inshrimpentation/database"
 	"github.com/rabidaudio/inshrimpentation/instruments"
 	"github.com/rabidaudio/inshrimpentation/server"
@@ -32,7 +32,7 @@ func main() {
 }
 
 func serve() {
-	log.Printf("starting server, env: %v\n", api.Env())
+	log.Printf("starting server, env: %v\n", env.Env())
 	db, err := database.Init()
 	if err != nil {
 		log.Fatalf("unable to start database: %v\n", err)

@@ -20,7 +20,7 @@ func TestMeasurements(t *testing.T) {
 		Value:           8.5,
 	}
 
-	err = db.Record(t.Context(), m)
+	err = db.Record(t.Context(), &m)
 	assert.NoError(t, err)
 
 	// read the measurements in that year

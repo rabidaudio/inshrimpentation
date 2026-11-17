@@ -6,6 +6,8 @@ github.com/go-chi/httplog/v3 v3.5.0 h1:QTd0cRZGznBMC1J9hm4reEfgneV92hvSHOoPR97f/
 github.com/go-chi/httplog/v3 v3.5.0/go.mod h1:tDhJo9G+F4mioDgX4pKbyA0uVZwCtHejoSsDkvJkFkU=
 github.com/mattn/go-sqlite3 v1.14.53 h1:mnTM0owzUMrKuLo+0w51NUiB0ir2Fo7kFXlPt/l3BGs=
 github.com/mattn/go-sqlite3 v1.14.53/go.mod h1:6JTjA44L93a0QCyJef5YvlPoKXntQPjzWv5gtm9sB6w=
+github.com/rabidaudio/api v0.0.0-20261117013253-4b9a96ce54e7 h1:9SyBm1BkdChsrCaIxNmh7VDcyvom1K+KlnuFlJ73ajI=
+github.com/rabidaudio/api v0.0.0-20261117013253-4b9a96ce54e7/go.mod h1:LWNB2V/XfZ5GfRmLNJhxphfd7vWLWNYWsJXtvHDF4KA=
 github.com/stretchr/testify v1.12.1 h1:EuwCh5fleGS7H32xRwO3wRGT7DxrDhLAT6FF8MpWDWE=
 github.com/stretchr/testify v1.12.1/go.mod h1:MDEgiDPPsNp5cuIrHPPCyornHKgEVbtFUmoNlxoYthg=
 github.com/vladimirvivien/go4vl v0.5.0 h1:1hTRP7aDsLSuHa4EBIm/VP3M0z16xJGPrxCGlYrbvcQ=

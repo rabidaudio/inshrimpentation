@@ -13,7 +13,8 @@ import (
 	"github.com/go-chi/httplog/v3"
 
 	"github.com/go-chi/chi/v5"
-	"github.com/rabidaudio/inshrimpentation/api"
+	"github.com/rabidaudio/api"
+	"github.com/rabidaudio/api/env"
 	"github.com/rabidaudio/inshrimpentation/database"
 )
 
@@ -60,14 +61,14 @@ func NewServer(db *database.DB) http.Handler {
 }
 
 type healthResponseBody struct {
-	Environment api.Environment `json:"environment"`
+	Environment env.Environment `json:"environment"`
 	CurrentTime time.Time       `json:"current_time"`
 }
 
 // HealthCheck implements a simple endpoint for checking if the server is running.
 func HealthCheck(w http.ResponseWriter, r *http.Request) {
 	api.Respond(w, &healthResponseBody{
-		Environment: api.Env(),
+		Environment: env.Env(),
 		CurrentTime: time.Now(),
 	}, "OK")
 }

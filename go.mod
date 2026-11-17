@@ -13,6 +13,7 @@ require (
 
 require (
 	github.com/go-chi/httplog/v3 v3.5.0 // indirect
+	github.com/rabidaudio/api v0.0.0-20261117013253-4b9a96ce54e7 // indirect
 	github.com/stretchr/testify v1.12.1 // indirect
 	go.yaml.in/yaml/v3 v3.0.5 // indirect
 	golang.org/x/sys v0.37.0 // indirect
