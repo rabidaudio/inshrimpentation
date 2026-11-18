@@ -15,7 +15,7 @@ https://www.raspberrypi.com/news/cloud-init-on-raspberry-pi-os/
 Alternatively: https://gokrazy.org (mediamtx is go and should work; hypothetically ffmpeg can be statically compiled and loaded?)
 https://inshrimp.lan:8892/cam/
 ```bash
-gok add github.com/bluenviron/mediamtx
+
 ```
 
 ```bash
@@ -25,7 +25,13 @@ go install github.com/gokrazy/tools/cmd/gok@main
 gok new -i shrimp
 gok add -i shrimp github.com/gokrazy/wifi
 gok edit -i shrimp # add wifi settings
+
 gok -i shrimp overwrite --full gokrazy/gokrazy_default.img --target_storage_bytes 31266439168
+
+git submodule init
+cd mediamtx
+DOCKERFILE_BINARIES="build-linux-arm64" make binaries
+gok -i gokrazy --parent_dir . add ./mediamtx
 ```
 
 
