@@ -9,9 +9,10 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"path"
 
-	_ "github.com/mattn/go-sqlite3"
 	"github.com/rabidaudio/api/env"
+	_ "modernc.org/sqlite"
 )
 
 type DB struct {
@@ -23,18 +24,15 @@ var tables = []string{
 	createConfigSQL,
 }
 
-func path() string {
-	e := env.Env()
-	dir := ""
-	if e == env.Test {
-		dir = "../"
-	}
-	return fmt.Sprintf("%vstorage/database_%v.db", dir, e)
-}
-
 func Init() (*DB, error) {
-	log.Printf("open db: %v\n", path())
-	db, err := sql.Open("sqlite3", path())
+	log.Printf("open db: %v\n", dbpath())
+	if env.IsProd() {
+		// make sure directory exists
+		if err := os.MkdirAll(path.Dir(dbpath()), 0664); err != nil {
+			return nil, err
+		}
+	}
+	db, err := sql.Open("sqlite", dbpath())
 	if err != nil {
 		return nil, err
 	}
@@ -47,7 +45,8 @@ func Init() (*DB, error) {
 }
 
 func Create() error {
-	_, err := os.Stat(path())
+	p := dbpath()
+	_, err := os.Stat(p)
 	if err == nil {
 		// file already exists
 		return nil
@@ -77,7 +76,7 @@ func (db *DB) Wipe() {
 	if !env.IsTest() {
 		panic("Don't wipe real database")
 	}
-	err := os.Remove(path())
+	err := os.Remove(dbpath())
 	if err != nil {
 		panic(err)
 	}
@@ -93,4 +92,22 @@ func GetDB(ctx context.Context) *DB {
 		panic(fmt.Errorf("No DB found in context"))
 	}
 	return db
+}
+
+func StorageRoot() string {
+	if env.IsProd() {
+		home, err := os.UserHomeDir()
+		if err != nil {
+			panic(err)
+		}
+		// overwrite to permanent filesystem
+		return fmt.Sprintf("%v/storage", home)
+	} else if env.IsTest() {
+		return "../storage"
+	}
+	return "storage"
+}
+
+func dbpath() string {
+	return fmt.Sprintf("%v/database_%v.db", StorageRoot(), env.Env())
 }

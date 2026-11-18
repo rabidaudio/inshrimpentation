@@ -55,7 +55,12 @@ func NewServer(db *database.DB) http.Handler {
 	s.Mount("/api", r)
 
 	// serve static files from dist outside of /api path
-	s.Mount("/", http.FileServer(http.Dir("frontend/dist")))
+	assets := "frontend/dist"
+	if env.IsProd() {
+		// TODO: static compile instead??
+		assets = "/perm/frontend"
+	}
+	s.Mount("/", http.FileServer(http.Dir(assets)))
 
 	return s
 }

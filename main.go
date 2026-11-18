@@ -24,8 +24,6 @@ func main() {
 		serve()
 	case "measure":
 		measure()
-	case "cron":
-		cron()
 	default:
 		log.Fatalf("Command required. Supported commands: serve, cron")
 	}
@@ -45,7 +43,7 @@ func serve() {
 	if port == "" {
 		port = "8080"
 	}
-	addr := "localhost:" + port
+	addr := ":" + port
 	fmt.Printf("Starting server on %v\n", addr)
 	err = http.ListenAndServe(addr, s)
 	if err != nil {
@@ -67,12 +65,4 @@ func measure() {
 	for _, m := range mm {
 		log.Printf("[%v] %v: %v\n", m.Time, m.MeasurementType, m.Formatted())
 	}
-}
-
-func cron() {
-	// TODO
-	// look at config for interval of different tasks
-	// look for log for which tasks are overdue
-	// execute all tasks
-	// exit
 }

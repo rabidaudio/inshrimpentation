@@ -4178,6 +4178,16 @@
 		)
 		(uuid "789f4712-6125-49f1-9a38-8efd57ea840c")
 	)
+	(text "https://pinout.xyz"
+		(exclude_from_sim no)
+		(at 116.84 115.57 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+		(uuid "843d8431-aec7-47a6-bce5-e31277a29240")
+	)
 	(text "Power input for LED array and also Raspberry Pi.\nRecommend 5V 3A usb power block"
 		(exclude_from_sim no)
 		(at 35.56 33.02 0)

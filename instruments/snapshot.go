@@ -6,6 +6,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/rabidaudio/inshrimpentation/database"
 	"github.com/rabidaudio/inshrimpentation/snapshot"
 )
 
@@ -19,7 +20,7 @@ func Snapshot() (float64, error) {
 		return 0, err
 	}
 
-	filename := fmt.Sprintf("storage/snapshots/%d.jpg", t)
+	filename := fmt.Sprintf("%v/snapshots/%d.jpg", database.StorageRoot(), t)
 	f, err := os.Create(filename)
 	if err != nil {
 		return 0, err
