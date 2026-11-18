@@ -1,0 +1,54 @@
+{
+    "Hostname": "shrimp",
+    "Update": {
+        "HTTPPassword": "..."
+    },
+    "Environment": [],
+    "Packages": [
+        "github.com/gokrazy/fbstatus",
+        "github.com/gokrazy/serial-busybox",
+        "github.com/gokrazy/breakglass",
+        "github.com/gokrazy/wifi",
+        "github.com/rabidaudio/inshrimpentation",
+        "github.com/gokrazy/mkfs"
+    ],
+    "PackageConfig": {
+        "github.com/gokrazy/breakglass": {
+            "ExtraFilePaths": {
+                "/etc/breakglass.authorized_keys": "breakglass.authorized_keys"
+            },
+            "CommandLineFlags": [
+                "-authorized_keys=/etc/breakglass.authorized_keys"
+            ]
+        },
+        "github.com/gokrazy/gokrazy/cmd/dhcp": {
+            "ExtraFilePaths": {
+                "/etc/gokrazy/static-dhcp-lease.json": "static-dhcp-lease.json"
+            },
+            "CommandLineFlags": [
+                "-static_network_config=/etc/gokrazy/static-dhcp-lease.json"
+            ]
+        },
+        "github.com/gokrazy/gokrazy/cmd/randomd": {
+            "ExtraFileContents": {
+                "/etc/machine-id": "....\n"
+            }
+        },
+        "github.com/gokrazy/wifi": {
+            "ExtraFilePaths": {
+                "/etc/wifi.json": "wifi.json"
+            }
+        },
+        "github.com/rabidaudio/inshrimpentation": {
+            "Environment": [
+                "APP_ENV=production",
+                "PORT=8080"
+            ],
+            "CommandLineFlags": [
+                "serve"
+            ]
+        }
+    },
+    "SerialConsole": "disabled",
+    "InternalCompatibilityFlags": {}
+}
