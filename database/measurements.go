@@ -45,7 +45,7 @@ func (db *DB) Record(ctx context.Context, m *Measurement) error {
 	return nil
 }
 
-func (db *DB) GetMeasurements(ctx context.Context, mt MeasurementType, timeRange [2]time.Time) ([]Measurement, error) {
+func (db *DB) GetMeasurements(ctx context.Context, mt MeasurementType, timeRange [2]time.Time) ([]*Measurement, error) {
 	rows, err := db.QueryContext(ctx,
 		`SELECT time, type, value FROM measurements
 		WHERE type = ? AND time >= ? and time < ? ORDER BY TIME ASC`,
@@ -55,13 +55,13 @@ func (db *DB) GetMeasurements(ctx context.Context, mt MeasurementType, timeRange
 	}
 	defer rows.Close()
 
-	var results []Measurement
+	var results []*Measurement
 	for rows.Next() {
 		var m Measurement
 		if err := rows.Scan(&m.Time, &m.MeasurementType, &m.Value); err != nil {
 			return nil, fmt.Errorf("db: query measurements: %w", err)
 		}
-		results = append(results, m)
+		results = append(results, &m)
 	}
 	if err := rows.Err(); err != nil {
 		return nil, fmt.Errorf("db: query measurements: %w", err)

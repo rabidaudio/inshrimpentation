@@ -49,7 +49,7 @@ func Measure(ctx context.Context) ([]*database.Measurement, error) {
 	return measurements, nil
 }
 
-func runTest(ctx context.Context, db *database.DB, c database.Config, t time.Time) (m *database.Measurement, err error) {
+func runTest(ctx context.Context, db *database.DB, c *database.Config, t time.Time) (m *database.Measurement, err error) {
 	i, ok := instruments[c.MeasurementType]
 	if !ok {
 		return m, fmt.Errorf("todo handle %v", c.MeasurementType)

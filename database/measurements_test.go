@@ -30,7 +30,7 @@ func TestMeasurements(t *testing.T) {
 	})
 	assert.NoError(t, err)
 	assert.Equal(t, 1, len(mm))
-	assert.EqualValues(t, m, mm[0])
+	assert.EqualValues(t, m, *mm[0])
 
 	// read measurements from the previous year and expect none
 	mm2, err := db.GetMeasurements(t.Context(), WaterLevel, [2]time.Time{

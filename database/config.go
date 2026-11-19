@@ -12,7 +12,7 @@ type Config struct {
 	LastCompleted   time.Time
 }
 
-func (db *DB) GetConfigs(ctx context.Context) ([]Config, error) {
+func (db *DB) GetConfigs(ctx context.Context) ([]*Config, error) {
 	rows, err := db.QueryContext(ctx,
 		`SELECT type, interval, last_completed FROM configs ORDER BY last_completed ASC`)
 	if err != nil {
@@ -20,13 +20,13 @@ func (db *DB) GetConfigs(ctx context.Context) ([]Config, error) {
 	}
 	defer rows.Close()
 
-	var results []Config
+	var results []*Config
 	for rows.Next() {
 		var c Config
 		if err := rows.Scan(&c.MeasurementType, &c.Interval, &c.LastCompleted); err != nil {
 			return nil, fmt.Errorf("db: query configs: %w", err)
 		}
-		results = append(results, c)
+		results = append(results, &c)
 	}
 	if err := rows.Err(); err != nil {
 		return nil, fmt.Errorf("db: query configs: %w", err)
