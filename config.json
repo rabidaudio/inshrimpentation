@@ -10,7 +10,8 @@
         "github.com/gokrazy/breakglass",
         "github.com/gokrazy/wifi",
         "github.com/rabidaudio/inshrimpentation",
-        "github.com/gokrazy/mkfs"
+        "github.com/gokrazy/mkfs",
+        "github.com/AlexxIT/go2rtc"
     ],
     "PackageConfig": {
         "github.com/gokrazy/breakglass": {
@@ -47,6 +48,16 @@
             "CommandLineFlags": [
                 "serve"
             ]
+        },
+        "github.com/bluenviron/mediamtx": {
+            "ExtraFilePaths": {
+                "/usr/local/etc/mediamtx.yml": "mediamtx.yml"
+            }
+        },
+        "github.com/AlexxIT/go2rtc": {
+            "ExtraFilePaths": {
+                "/go2rtc/go2rtc.yaml": "go2rtc.yaml"
+            }
         }
     },
     "SerialConsole": "disabled",
