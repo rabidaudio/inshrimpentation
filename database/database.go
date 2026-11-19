@@ -19,11 +19,6 @@ type DB struct {
 	*sql.DB
 }
 
-var tables = []string{
-	createMeasurementSQL,
-	createConfigSQL,
-}
-
 func Init() (*DB, error) {
 	log.Printf("open db: %v\n", dbpath())
 	if env.IsProd() {
@@ -40,8 +35,12 @@ func Init() (*DB, error) {
 	if err != nil {
 		return nil, err
 	}
-
-	return &DB{db}, nil
+	dbi := &DB{db}
+	err = RunMigrations(dbi)
+	if err != nil {
+		return nil, fmt.Errorf("migrate error: %v", err)
+	}
+	return dbi, nil
 }
 
 func Create() error {
@@ -60,14 +59,6 @@ func Create() error {
 		return err
 	}
 	defer db.Close()
-
-	// create tables
-	for _, sql := range tables {
-		_, err = db.Exec(sql)
-		if err != nil {
-			return err
-		}
-	}
 
 	return nil
 }
