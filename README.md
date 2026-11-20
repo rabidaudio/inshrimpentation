@@ -49,3 +49,6 @@ Temperature
         more than 23 C (73.5F)
 Brightness:
     measurements: (arbitrary - relative measure, range TBD)
+
+
+https://cad.onshape.com/documents/8f74ccdbefb985152d23f960/w/87353d4eeef811a2b8056367/e/cb90858fdb4eb002a92e8198
