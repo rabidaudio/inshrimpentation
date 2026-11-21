@@ -1,0 +1,10 @@
+tasks:
+  water_level:
+    interval: 1h
+    options:
+      low_level: -1.5 # alert when the water has fallen an inch and a half
+  temperature:
+    interval: 15m
+    enabled: false
+  needs_cleaning:
+    interval: 672h # 4 weeks: replace filters, trim plants, and if necessary change water

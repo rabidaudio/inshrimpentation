@@ -3,6 +3,7 @@ package instruments
 import (
 	"fmt"
 
+	"github.com/rabidaudio/api/env"
 	"periph.io/x/conn/v3/onewire"
 	"periph.io/x/conn/v3/onewire/onewirereg"
 	"periph.io/x/conn/v3/physic"
@@ -14,6 +15,10 @@ import (
 // protocol and returns a temperature in Celsius
 // with a resolution of 12-bits (0.0625C steps).
 func Temperature() (float64, error) {
+	if !env.IsProd() {
+		return 20.1, nil // mock data
+	}
+
 	_, err := host.Init()
 	if err != nil {
 		return 0, err

@@ -15,22 +15,35 @@ type Alert struct {
 }
 
 func (db *DB) AddAlert(ctx context.Context, a *Alert) error {
-	res, err := db.ExecContext(ctx,
-		`INSERT INTO alerts (type, time, suppressed, message) VALUES (?, ?, ?, ?) RETURNING id`,
-		a.Type, a.Time, a.Suppressed, a.Message)
-	if err != nil {
-		return fmt.Errorf("db: insert alert: %w", err)
-	}
-	id, err := res.LastInsertId()
-	if err != nil {
-		return fmt.Errorf("db: insert alert: %w", err)
-	}
-	a.id = id
-	return nil
+	return db.InTx(ctx, nil, func(db *DB) error {
+		existing, err := db.db.QueryContext(ctx,
+			`SELECT 1 FROM alerts WHERE type = ? and suppressed = ? LIMIT 1`, a.Type, false)
+		if err != nil {
+			return fmt.Errorf("db: insert alert: %w", err)
+		}
+		defer existing.Close()
+
+		if existing.Next() {
+			return nil // already exists, don't make a new one
+		}
+
+		res, err := db.db.ExecContext(ctx,
+			`INSERT INTO alerts (type, time, suppressed, message) VALUES (?, ?, ?, ?) RETURNING id`,
+			a.Type, a.Time, a.Suppressed, a.Message)
+		if err != nil {
+			return fmt.Errorf("db: insert alert: %w", err)
+		}
+		id, err := res.LastInsertId()
+		if err != nil {
+			return fmt.Errorf("db: insert alert: %w", err)
+		}
+		a.id = id
+		return nil
+	})
 }
 
 func (db *DB) SupressAlert(ctx context.Context, a *Alert) error {
-	_, err := db.ExecContext(ctx,
+	_, err := db.db.ExecContext(ctx,
 		`UPDATE alerts SET suppressed = TRUE WHERE id = ?`, a.id)
 	if err != nil {
 		return fmt.Errorf("db: update alert: %w", err)
@@ -44,7 +57,7 @@ func (db *DB) GetAlerts(ctx context.Context, all bool) ([]*Alert, error) {
 		query += ` WHERE suppressed = FALSE`
 	}
 	query += ` ORDER BY time DESC`
-	rows, err := db.QueryContext(ctx, query)
+	rows, err := db.db.QueryContext(ctx, query)
 	if err != nil {
 		return nil, err
 	}

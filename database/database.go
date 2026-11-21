@@ -15,8 +15,38 @@ import (
 	_ "modernc.org/sqlite"
 )
 
+type dbLike interface {
+	ExecContext(ctx context.Context, query string, args ...any) (sql.Result, error)
+	QueryContext(ctx context.Context, query string, args ...any) (*sql.Rows, error)
+	QueryRowContext(ctx context.Context, query string, args ...any) *sql.Row
+}
+
 type DB struct {
-	*sql.DB
+	db   dbLike
+	isTx bool
+}
+
+func (db *DB) InTx(ctx context.Context, opts *sql.TxOptions, fn func(db *DB) error) error {
+	if db.isTx {
+		return fn(db)
+	}
+	tx, err := db.db.(*sql.DB).BeginTx(ctx, opts)
+	if err != nil {
+		return err
+	}
+	err = fn(&DB{db: tx, isTx: true})
+	if err != nil {
+		_ = tx.Rollback()
+		return err
+	}
+	return tx.Commit()
+}
+
+func (db *DB) Close() error {
+	if db.isTx {
+		return fmt.Errorf("db: cannot close: inside transaction")
+	}
+	return db.db.(*sql.DB).Close()
 }
 
 func Init() (*DB, error) {
@@ -27,15 +57,19 @@ func Init() (*DB, error) {
 			return nil, err
 		}
 	}
-	db, err := sql.Open("sqlite", dbpath())
+	db, err := sql.Open("sqlite", fmt.Sprintf("file:%s?_pragma=journal_mode(WAL)&_pragma=busy_timeout(5000)", dbpath()))
 	if err != nil {
 		return nil, err
 	}
+
+	db.SetMaxOpenConns(4)
+	db.SetMaxIdleConns(4)
+
 	err = db.Ping()
 	if err != nil {
 		return nil, err
 	}
-	dbi := &DB{db}
+	dbi := &DB{db: db, isTx: false}
 	err = RunMigrations(dbi)
 	if err != nil {
 		return nil, fmt.Errorf("migrate error: %v", err)
@@ -63,16 +97,6 @@ func Create() error {
 	return nil
 }
 
-func (db *DB) Wipe() {
-	if !env.IsTest() {
-		panic("Don't wipe real database")
-	}
-	err := os.Remove(dbpath())
-	if err != nil {
-		panic(err)
-	}
-}
-
 func WithDB(ctx context.Context, db *DB) context.Context {
 	return context.WithValue(ctx, "DB", db)
 }
@@ -91,14 +115,38 @@ func StorageRoot() string {
 		if err != nil {
 			panic(err)
 		}
-		// overwrite to permanent filesystem
 		return fmt.Sprintf("%v/storage", home)
-	} else if env.IsTest() {
-		return "../storage"
 	}
-	return "storage"
+	root, err := findProjectRoot()
+	if err != nil {
+		panic(err)
+	}
+	return path.Join(root, "storage")
+}
+
+func findProjectRoot() (string, error) {
+	dir, err := os.Getwd()
+	if err != nil {
+		return "", err
+	}
+	for {
+		_, err := os.Stat(path.Join(dir, "go.mod"))
+		if err == nil {
+			return dir, nil
+		}
+		if !os.IsNotExist(err) {
+			return "", err
+		}
+		if dir == "/" {
+			return "", fmt.Errorf("unable to find project root")
+		}
+		dir = path.Dir(dir)
+	}
 }
 
 func dbpath() string {
+	if env.IsTest() {
+		return ":memory:"
+	}
 	return fmt.Sprintf("%v/database_%v.db", StorageRoot(), env.Env())
 }

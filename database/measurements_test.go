@@ -8,16 +8,13 @@ import (
 )
 
 func TestMeasurements(t *testing.T) {
-	assert.NoError(t, Create())
-
 	db, err := Init()
 	assert.NoError(t, err)
-	defer db.Wipe()
 
 	m := Measurement{
-		Time:            time.Date(2026, 11, 1, 15, 00, 00, 00, time.UTC),
-		MeasurementType: WaterLevel,
-		Value:           8.5,
+		Time:  time.Date(2026, 11, 1, 15, 00, 00, 00, time.UTC),
+		Type:  WaterLevel,
+		Value: 8.5,
 	}
 
 	err = db.Record(t.Context(), &m)

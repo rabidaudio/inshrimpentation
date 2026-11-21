@@ -16,13 +16,13 @@ const (
 )
 
 type Measurement struct {
-	Time            time.Time
-	MeasurementType MeasurementType
-	Value           float64
+	Time  time.Time
+	Type  MeasurementType
+	Value float64
 }
 
 func (m *Measurement) Formatted() string {
-	switch m.MeasurementType {
+	switch m.Type {
 	case WaterLevel:
 		return fmt.Sprintf("%v inches", m.Value)
 	case Temperature:
@@ -30,15 +30,15 @@ func (m *Measurement) Formatted() string {
 	case Snapshot:
 		return fmt.Sprintf("snapshots/%v.jpg", int(m.Value))
 	default:
-		panic(fmt.Errorf("unsupported type: %v", m.MeasurementType))
+		panic(fmt.Errorf("unsupported type: %v", m.Type))
 	}
 }
 
 func (db *DB) Record(ctx context.Context, m *Measurement) error {
-	_, err := db.ExecContext(ctx,
+	_, err := db.db.ExecContext(ctx,
 		`INSERT INTO measurements (time, type, value)
 		VALUES (?, ?, ?)`,
-		m.Time, string(m.MeasurementType), m.Value)
+		m.Time, string(m.Type), m.Value)
 	if err != nil {
 		return fmt.Errorf("db: create measurement: %w", err)
 	}
@@ -46,7 +46,7 @@ func (db *DB) Record(ctx context.Context, m *Measurement) error {
 }
 
 func (db *DB) GetMeasurements(ctx context.Context, mt MeasurementType, timeRange [2]time.Time) ([]*Measurement, error) {
-	rows, err := db.QueryContext(ctx,
+	rows, err := db.db.QueryContext(ctx,
 		`SELECT time, type, value FROM measurements
 		WHERE type = ? AND time >= ? and time < ? ORDER BY TIME ASC`,
 		mt, timeRange[0], timeRange[1])
@@ -58,7 +58,7 @@ func (db *DB) GetMeasurements(ctx context.Context, mt MeasurementType, timeRange
 	var results []*Measurement
 	for rows.Next() {
 		var m Measurement
-		if err := rows.Scan(&m.Time, &m.MeasurementType, &m.Value); err != nil {
+		if err := rows.Scan(&m.Time, &m.Type, &m.Value); err != nil {
 			return nil, fmt.Errorf("db: query measurements: %w", err)
 		}
 		results = append(results, &m)

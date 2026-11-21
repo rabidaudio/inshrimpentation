@@ -8,11 +8,8 @@ import (
 )
 
 func TestAlerts(t *testing.T) {
-	assert.NoError(t, Create())
-
 	db, err := Init()
 	assert.NoError(t, err)
-	defer db.Wipe()
 
 	// create an alert
 	a1 := Alert{
